@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiral Timeline 3D</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: #FFFFFF;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 40px 60px;
+            z-index: 100;
+        }
+
+        .header__year {
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            color: #000000;
+            letter-spacing: 0.1em;
+        }
+
+        .header__separator {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 1px;
+            background-color: #000000;
+        }
+
+        .title {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+            max-width: 650px;
+            padding: 0 20px;
+        }
+
+        .title__text {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: clamp(28px, 4.5vw, 48px);
+            font-style: italic;
+            font-weight: 400;
+            color: #000000;
+            line-height: 1.3;
+            letter-spacing: 0.02em;
+        }
+
+        .spiral-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+        }
+
+        .spiral-wrapper {
+            position: relative;
+            width: 900px;
+            height: 900px;
+            transform-style: preserve-3d;
+            transform: rotateX(65deg);
+        }
+
+        #spiralCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .go-button {
+            position: fixed;
+            bottom: 40px;
+            right: 60px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            color: #000000;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .go-button:hover {
+            transform: translateX(5px);
+        }
+
+        .go-button__arrow svg {
+            width: 24px;
+            height: 24px;
+            stroke: #000000;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px;
+            }
+
+            .header__year {
+                font-size: 12px;
+            }
+
+            .spiral-wrapper {
+                width: 500px;
+                height: 500px;
+            }
+
+            .go-button {
+                bottom: 30px;
+                right: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .spiral-wrapper {
+                width: 350px;
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <span class="header__year">2003</span>
+        <div class="header__separator"></div>
+        <span class="header__year">2026</span>
+    </header>
+
+    <div class="title">
+        <h1 class="title__text">Our eccentric story: the odd, quirky, and wonderful journey so far!</h1>
+    </div>
+
+    <div class="spiral-container">
+        <div class="spiral-wrapper">
+            <canvas id="spiralCanvas"></canvas>
+        </div>
+    </div>
+
+    <a href="#" class="go-button">
+        <span class="go-button__arrow">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </span>
+        <span>Go</span>
+    </a>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const canvas = document.getElementById('spiralCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Configuration
+            const config = {
+                startYear: 2003,
+                endYear: 2026,
+                totalRotations: 4,
+                startRadius: 40,
+                endRadius: 380,
+                waveAmplitude: 25,
+                waveSpeed: 0.003,
+                waveFrequency: 8,
+                spiralPoints: 500,
+                yearPointRadius: 5
+            };
+
+            let time = 0;
+            let animationId;
+
+            function resizeCanvas() {
+                const wrapper = canvas.parentElement;
+                const rect = wrapper.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                ctx.scale(dpr, dpr);
+            }
+
+            function getSpiralPoint(t, time) {
+                const angle = t * config.totalRotations * 2 * Math.PI;
+                const radius = config.startRadius + (config.endRadius - config.startRadius) * t;
+
+                // Wave effect on the spiral line
+                const waveOffset = t * config.waveFrequency * Math.PI * 2;
+                const wave = Math.sin(time + waveOffset) * config.waveAmplitude * t;
+
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius + wave;
+
+                return { x, y, angle, radius };
+            }
+
+            function drawSpiral(time) {
+                const wrapper = canvas.parentElement;
+                const rect = wrapper.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                ctx.clearRect(0, 0, rect.width, rect.height);
+
+                // Draw spiral path with wave animation
+                ctx.beginPath();
+                ctx.strokeStyle = '#CCCCCC';
+                ctx.lineWidth = 1.5;
+                ctx.lineCap = 'round';
+
+                for (let i = 0; i <= config.spiralPoints; i++) {
+                    const t = i / config.spiralPoints;
+                    const point = getSpiralPoint(t, time);
+
+                    if (i === 0) {
+                        ctx.moveTo(centerX + point.x, centerY + point.y);
+                    } else {
+                        ctx.lineTo(centerX + point.x, centerY + point.y);
+                    }
+                }
+                ctx.stroke();
+
+                // Draw year points and labels
+                const totalYears = config.endYear - config.startYear + 1;
+
+                for (let i = 0; i < totalYears; i++) {
+                    const t = i / (totalYears - 1);
+                    const point = getSpiralPoint(t, time);
+                    const year = config.startYear + i;
+
+                    const px = centerX + point.x;
+                    const py = centerY + point.y;
+
+                    // Draw point circle
+                    ctx.beginPath();
+                    ctx.arc(px, py, config.yearPointRadius, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1.5;
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Draw year label
+                    ctx.font = '11px Georgia';
+                    ctx.fillStyle = '#333333';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+
+                    // Position label based on angle
+                    const labelAngle = point.angle % (Math.PI * 2);
+                    const labelOffset = 15;
+                    let labelX, labelY;
+
+                    if (labelAngle < Math.PI / 2 || labelAngle > 3 * Math.PI / 2) {
+                        labelX = px + labelOffset;
+                        ctx.textAlign = 'left';
+                    } else {
+                        labelX = px - labelOffset;
+                        ctx.textAlign = 'right';
+                    }
+                    labelY = py;
+
+                    ctx.fillText(year.toString(), labelX, labelY);
+                }
+            }
+
+            function animate(timestamp) {
+                time = timestamp * config.waveSpeed;
+                drawSpiral(time);
+                animationId = requestAnimationFrame(animate);
+            }
+
+            function init() {
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                animationId = requestAnimationFrame(animate);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>
