@@ -324,6 +324,11 @@
       transition: var(--transition-base);
     }
 
+    /* Disable mix-blend-mode when mobile menu is open */
+    .nav.menu-open {
+      mix-blend-mode: normal;
+    }
+
     .nav__logo {
       font-size: var(--font-size-sm);
       font-weight: 700;
@@ -2729,27 +2734,67 @@
     ============================================ */
     @media (max-width: 768px) {
 
-      /* Mobile Menu - White fullscreen */
+      /* Mobile Menu - White fullscreen, slides from right */
       .nav__menu {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: var(--color-white);
+        background: #ffffff;
+        display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: var(--space-xl);
-        opacity: 0;
+        transform: translateX(100%);
         visibility: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 999;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+          visibility 0.4s ease;
+        z-index: 9999;
       }
 
       .nav__menu.active {
-        opacity: 1;
+        transform: translateX(0);
         visibility: visible;
+      }
+
+      /* Close button for mobile menu */
+      .nav__close {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        width: 44px;
+        height: 44px;
+        background: transparent;
+        border: 2px solid var(--color-black);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .nav__close svg {
+        width: 20px;
+        height: 20px;
+        color: var(--color-black);
+      }
+
+      .nav__close:hover {
+        background: var(--color-black);
+      }
+
+      .nav__close:hover svg {
+        color: var(--color-white);
+      }
+
+      /* Hide chat widget when menu is open */
+      .nav.menu-open~.chat-widget,
+      body.menu-open .chat-widget {
+        opacity: 0 !important;
+        pointer-events: none !important;
       }
 
       .nav__menu .nav__link {
@@ -3171,6 +3216,11 @@
     </button>
 
     <ul class="nav__menu">
+      <button class="nav__close" aria-label="Fermer le menu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
       <li><a href="#about" class="nav__link">About</a></li>
       <li><a href="#projets" class="nav__link">Projets</a></li>
       <li><a href="#contact" class="nav__link">Contact</a></li>
@@ -3651,21 +3701,43 @@
     const navToggle = document.querySelector('.nav__toggle');
     const navMenu = document.querySelector('.nav__menu');
     const navLinks = document.querySelectorAll('.nav__link');
+    const nav = document.querySelector('.nav');
+    const navClose = document.querySelector('.nav__close');
+
+    // Function to open menu
+    function openMenu() {
+      navToggle.classList.add('active');
+      navMenu.classList.add('active');
+      nav.classList.add('menu-open');
+      document.body.classList.add('menu-open');
+      navToggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Function to close menu
+    function closeMenu() {
+      navToggle.classList.remove('active');
+      navMenu.classList.remove('active');
+      nav.classList.remove('menu-open');
+      document.body.classList.remove('menu-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
 
     navToggle.addEventListener('click', () => {
-      const isActive = navToggle.classList.toggle('active');
-      navMenu.classList.toggle('active');
-      navToggle.setAttribute('aria-expanded', isActive);
-      document.body.style.overflow = isActive ? 'hidden' : '';
+      if (navMenu.classList.contains('active')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
 
+    // Close button event
+    navClose.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a link
     navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        navToggle.classList.remove('active');
-        navMenu.classList.remove('active');
-        navToggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      });
+      link.addEventListener('click', closeMenu);
     });
 
     // ============================================
