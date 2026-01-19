@@ -82,7 +82,6 @@
        BASE STYLES
     ============================================ */
     html {
-      scroll-snap-type: y mandatory;
       scroll-behavior: smooth;
       font-size: 16px;
     }
@@ -97,6 +96,65 @@
     }
 
     /* ============================================
+       ANIMATED 3D GRADIENT BACKGROUND
+    ============================================ */
+    #gradient-background-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    #gradient-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Sections with gradient background visible */
+    .hero.section-with-gradient,
+    .about.section-with-gradient,
+    .projects.section-with-gradient,
+    .contact.section-with-gradient {
+      background: transparent !important;
+    }
+
+    /* Hide existing background blobs when gradient is active */
+    .hero.section-with-gradient .hero__blob {
+      display: none;
+    }
+
+    /* Hide wave lines when gradient is active */
+    .about.section-with-gradient .about__waves {
+      display: none;
+    }
+
+    /* Contact section - transparent background to show gradient */
+    .contact {
+      position: relative;
+      background: transparent !important;
+      z-index: 2;
+    }
+
+    /* Fade transition before footer section */
+    .contact.section-with-gradient::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(to bottom, transparent, var(--color-dark));
+      pointer-events: none;
+      z-index: 3;
+    }
+
+
+    /* ============================================
        INTRO OVERLAY
     ============================================ */
     .intro {
@@ -105,7 +163,7 @@
       left: 0;
       width: 100%;
       height: 100vh;
-      background: var(--color-white);
+      background: transparent;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -120,13 +178,23 @@
       pointer-events: none;
     }
 
+    /* Gradient canvas over content when intro visible */
+    body:has(.intro:not(.hidden)) #gradient-background-container {
+      z-index: 9998;
+    }
+
+    /* Reset when intro hidden */
+    body:has(.intro.hidden) #gradient-background-container {
+      z-index: -1;
+    }
+
     .intro__name {
       font-size: clamp(80px, 18vw, 280px);
       font-weight: 900;
       letter-spacing: -0.02em;
       text-align: center;
       text-transform: uppercase;
-      color: var(--color-black);
+      color: var(--color-white);
       line-height: 0.9;
       display: flex;
       flex-wrap: wrap;
@@ -151,14 +219,12 @@
     }
 
     .intro__first-name .intro__letter {
-      background: linear-gradient(180deg, var(--color-black) 0%, var(--color-gray-600) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--color-white);
+      -webkit-text-fill-color: var(--color-white);
     }
 
     .intro__last-name .intro__letter {
-      color: var(--color-black);
+      color: var(--color-white);
     }
 
     @keyframes letterReveal {
@@ -177,8 +243,8 @@
       margin-top: var(--space-xl);
       padding: var(--space-sm) var(--space-xl);
       background: transparent;
-      border: 2px solid var(--color-black);
-      color: var(--color-black);
+      border: 2px solid var(--color-white);
+      color: var(--color-white);
       font-family: var(--font-family);
       font-size: var(--font-size-sm);
       font-weight: 600;
@@ -201,15 +267,15 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: var(--color-black);
+      background: var(--color-white);
       transition: left 0.4s ease;
       z-index: -1;
     }
 
     .intro__button:hover {
-      color: var(--color-white);
+      color: var(--color-black);
       transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
     }
 
     .intro__button:hover::before {
@@ -234,7 +300,7 @@
       left: 0;
       width: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--color-gray-300), var(--color-gray-400), var(--color-gray-300), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3), transparent);
       animation: introLineReveal 1.5s ease forwards;
       animation-delay: 0.8s;
     }
@@ -246,7 +312,7 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 12px;
-      color: var(--color-gray-400);
+      color: rgba(255, 255, 255, 0.6);
       animation: introStarMove 4s linear infinite;
       animation-delay: 2s;
     }
@@ -437,8 +503,6 @@
        SECTIONS BASE
     ============================================ */
     section {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
       min-height: 100vh;
       position: relative;
       overflow: hidden;
@@ -455,8 +519,6 @@
       align-items: center;
       background: var(--color-white);
       position: relative;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
     }
 
     .hero__background {
@@ -523,7 +585,7 @@
       font-size: var(--font-size-hero);
       font-weight: 300;
       line-height: 1.2;
-      color: var(--color-black);
+      color: var(--color-white);
       opacity: 0;
       animation: fadeInUp 1s ease forwards, textGlow 3s ease-in-out infinite 2s;
       animation-delay: 0.3s;
@@ -868,7 +930,7 @@
       font-size: var(--font-size-sm);
       font-weight: 500;
       letter-spacing: 0.1em;
-      color: var(--color-gray-500);
+      color: var(--color-white);
       margin-right: var(--space-sm);
     }
 
@@ -899,7 +961,7 @@
     .about__subtitle {
       font-size: var(--font-size-xl);
       font-weight: 400;
-      color: var(--color-gray-600);
+      color: var(--color-white);
       margin-bottom: var(--space-lg);
       transition: color var(--transition-base);
       opacity: 0;
@@ -914,7 +976,7 @@
     .about__text {
       font-size: var(--font-size-base);
       line-height: 1.8;
-      color: var(--color-gray-700);
+      color: var(--color-white);
       margin-bottom: var(--space-xl);
       opacity: 0;
       transform: translateY(20px);
@@ -1162,6 +1224,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      color: var(--color-white);
     }
 
     .projects__grid {
@@ -1174,10 +1237,10 @@
     }
 
     .project-card {
-      background: var(--color-white);
+      background: var(--color-black);
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
       transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.8s ease;
       opacity: 0;
       transform: translateY(50px);
@@ -1355,11 +1418,12 @@
       font-size: var(--font-size-xl);
       font-weight: 700;
       margin-bottom: var(--space-sm);
+      color: var(--color-white);
     }
 
     .project-card__description {
       font-size: var(--font-size-sm);
-      color: var(--color-gray-600);
+      color: var(--color-white);
       line-height: 1.6;
       margin-bottom: var(--space-md);
     }
@@ -2734,14 +2798,14 @@
     ============================================ */
     @media (max-width: 768px) {
 
-      /* Mobile Menu - White fullscreen, slides from right */
+      /* Mobile Menu - Gradient fullscreen, slides from right */
       .nav__menu {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: #ffffff;
+        background: transparent;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -2752,6 +2816,34 @@
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
           visibility 0.4s ease;
         z-index: 9999;
+      }
+
+      /* Canvas clone for mobile menu background */
+      .nav__menu::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a0a05 25%, #d4590f 50%, #8a3a0a 75%, #0a0a0a 100%);
+        background-size: 400% 400%;
+        animation: menuGradientFlow 8s ease infinite;
+        z-index: -1;
+      }
+
+      @keyframes menuGradientFlow {
+        0% {
+          background-position: 0% 50%;
+        }
+
+        50% {
+          background-position: 100% 50%;
+        }
+
+        100% {
+          background-position: 0% 50%;
+        }
       }
 
       .nav__menu.active {
@@ -2767,7 +2859,7 @@
         width: 44px;
         height: 44px;
         background: transparent;
-        border: 2px solid var(--color-black);
+        border: 2px solid var(--color-white);
         border-radius: 50%;
         cursor: pointer;
         display: flex;
@@ -2779,15 +2871,15 @@
       .nav__close svg {
         width: 20px;
         height: 20px;
-        color: var(--color-black);
+        color: var(--color-white);
       }
 
       .nav__close:hover {
-        background: var(--color-black);
+        background: var(--color-white);
       }
 
       .nav__close:hover svg {
-        color: var(--color-white);
+        color: var(--color-black);
       }
 
       /* Hide chat widget when menu is open */
@@ -2800,12 +2892,12 @@
       .nav__menu .nav__link {
         font-size: var(--font-size-2xl);
         font-weight: 600;
-        color: var(--color-black);
+        color: var(--color-white);
         opacity: 1;
         transform: none;
         animation: none;
         padding: 16px 48px;
-        border: 2px solid var(--color-black);
+        border: 2px solid var(--color-white);
         border-radius: 8px;
         text-align: center;
         min-width: 200px;
@@ -2841,8 +2933,8 @@
       }
 
       .nav__menu .nav__link:hover {
-        background: var(--color-black);
-        color: var(--color-white);
+        background: var(--color-white);
+        color: var(--color-black);
         transform: scale(1.05);
       }
 
@@ -2856,7 +2948,7 @@
       }
 
       .nav__toggle.active span {
-        background: var(--color-black);
+        background: var(--color-white);
       }
 
       /* Hero section - allow full spiral visibility */
@@ -3192,6 +3284,13 @@
 
 <body>
   <!-- ============================================
+       ANIMATED 3D GRADIENT BACKGROUND
+  ============================================ -->
+  <div id="gradient-background-container">
+    <canvas id="gradient-canvas"></canvas>
+  </div>
+
+  <!-- ============================================
        INTRO OVERLAY
   ============================================ -->
   <div class="intro" id="intro">
@@ -3277,7 +3376,7 @@
       </div>
 
       <div class="about__content">
-        <p class="about__subtitle"><span class="about__label">(About)</span> Développeur & Designer Web</p>
+        <p class="about__subtitle">Développeur & Designer Web</p>
 
         <p class="about__text">
           Passionné par le design et le développement web depuis plus de 3 ans, je crée des expériences digitales qui
@@ -3437,7 +3536,7 @@
 
     <div class="contact__container">
       <div class="contact__info">
-        <span class="contact__label">Contact</span>
+
         <h2 class="contact__title">Transformons vos idées en réalité</h2>
         <p class="contact__text">
           Vous avez un projet en tête ? Discutons ensemble de comment je peux vous aider à créer une présence digitale
@@ -3805,36 +3904,59 @@
 
     if (introButton && introOverlay) {
       introButton.addEventListener('click', () => {
-        // Add hidden class to trigger fade out
-        introOverlay.classList.add('hidden');
+        // Immediately hide the name and button with fade animation
+        const introName = document.querySelector('.intro__name');
+        const introDecoLine = document.querySelector('.intro__decorative-line');
 
-        // Activate hero animations at the same time
-        const hero = document.querySelector('.hero');
-        if (hero) {
-          hero.classList.add('active');
+        // Apply fade out to content immediately
+        if (introName) {
+          introName.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          introName.style.opacity = '0';
+          introName.style.transform = 'translateY(-20px)';
+        }
+        if (introButton) {
+          introButton.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          introButton.style.opacity = '0';
+          introButton.style.transform = 'translateY(-20px)';
+        }
+        if (introDecoLine) {
+          introDecoLine.style.transition = 'opacity 0.3s ease';
+          introDecoLine.style.opacity = '0';
         }
 
-        // Start spiral animation after 2 seconds
-        if (typeof window.startSpiralAnimation === 'function') {
-          window.startSpiralAnimation();
-        }
-
-        // Show chat widget after intro animation
+        // Wait for content fade, then hide intro overlay
         setTimeout(() => {
-          const chatWidgetEl = document.getElementById('chatWidget');
-          if (chatWidgetEl) {
-            chatWidgetEl.classList.add('visible');
+          // Add hidden class to trigger fade out
+          introOverlay.classList.add('hidden');
+
+          // Activate hero animations at the same time
+          const hero = document.querySelector('.hero');
+          if (hero) {
+            hero.classList.add('active');
           }
-        }, 1500);
 
-        // Scroll to header after transition
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: 'instant' });
-          // Remove intro from DOM after animation
+          // Start spiral animation after 2 seconds
+          if (typeof window.startSpiralAnimation === 'function') {
+            window.startSpiralAnimation();
+          }
+
+          // Show chat widget after intro animation
           setTimeout(() => {
-            introOverlay.style.display = 'none';
-          }, 500);
-        }, 1000);
+            const chatWidgetEl = document.getElementById('chatWidget');
+            if (chatWidgetEl) {
+              chatWidgetEl.classList.add('visible');
+            }
+          }, 1500);
+
+          // Scroll to header after transition
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            // Remove intro from DOM after animation
+            setTimeout(() => {
+              introOverlay.style.display = 'none';
+            }, 500);
+          }, 1000);
+        }, 300); // Wait for content fade out
       });
     }
 
@@ -4302,6 +4424,276 @@
         document.addEventListener('DOMContentLoaded', init);
       } else {
         init();
+      }
+    })();
+  </script>
+
+  <!-- Three.js for Gradient Animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Animated 3D Gradient Background Script -->
+  <script>
+    (function () {
+      // Vertex Shader
+      const vertexShader = `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+
+      // Fragment Shader with Simplex Noise
+      const fragmentShader = `
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform float uScrollProgress;
+        varying vec2 vUv;
+
+        // Simplex noise functions for organic movement
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+        float snoise(vec3 v) {
+          const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+          const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+          
+          vec3 i  = floor(v + dot(v, C.yyy));
+          vec3 x0 = v - i + dot(i, C.xxx);
+          
+          vec3 g = step(x0.yzx, x0.xyz);
+          vec3 l = 1.0 - g;
+          vec3 i1 = min(g.xyz, l.zxy);
+          vec3 i2 = max(g.xyz, l.zxy);
+          
+          vec3 x1 = x0 - i1 + C.xxx;
+          vec3 x2 = x0 - i2 + C.yyy;
+          vec3 x3 = x0 - D.yyy;
+          
+          i = mod289(i);
+          vec4 p = permute(permute(permute(
+                   i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                 + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                 + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+          
+          float n_ = 0.142857142857;
+          vec3  ns = n_ * D.wyz - D.xzx;
+          
+          vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+          
+          vec4 x_ = floor(j * ns.z);
+          vec4 y_ = floor(j - 7.0 * x_);
+          
+          vec4 x = x_ *ns.x + ns.yyyy;
+          vec4 y = y_ *ns.x + ns.yyyy;
+          vec4 h = 1.0 - abs(x) - abs(y);
+          
+          vec4 b0 = vec4(x.xy, y.xy);
+          vec4 b1 = vec4(x.zw, y.zw);
+          
+          vec4 s0 = floor(b0)*2.0 + 1.0;
+          vec4 s1 = floor(b1)*2.0 + 1.0;
+          vec4 sh = -step(h, vec4(0.0));
+          
+          vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+          vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+          
+          vec3 p0 = vec3(a0.xy, h.x);
+          vec3 p1 = vec3(a0.zw, h.y);
+          vec3 p2 = vec3(a1.xy, h.z);
+          vec3 p3 = vec3(a1.zw, h.w);
+          
+          vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+          p0 *= norm.x;
+          p1 *= norm.y;
+          p2 *= norm.z;
+          p3 *= norm.w;
+          
+          vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+          m = m * m;
+          return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+        }
+
+        void main() {
+          vec2 uv = vUv;
+          
+          // Color palette: orange, black, white
+          vec3 orange = vec3(0.85, 0.35, 0.15);
+          vec3 deepOrange = vec3(0.6, 0.2, 0.05);
+          vec3 black = vec3(0.02, 0.02, 0.02);
+          vec3 darkGray = vec3(0.1, 0.08, 0.08);
+          vec3 warmWhite = vec3(0.95, 0.9, 0.85);
+          
+          // Time-based animation
+          float time = uTime * 0.3;
+          
+          // Multiple noise layers for 3D fluid effect
+          float noise1 = snoise(vec3(uv * 2.0, time * 0.5));
+          float noise2 = snoise(vec3(uv * 3.0 + 10.0, time * 0.3 + 5.0));
+          float noise3 = snoise(vec3(uv * 1.5 + 20.0, time * 0.4 + 10.0));
+          
+          // Combine noises for organic shapes
+          float combinedNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+          
+          // Create color flows
+          float flow1 = snoise(vec3(uv.x * 2.0 + time * 0.2, uv.y * 1.5 + time * 0.1, time * 0.15));
+          float flow2 = snoise(vec3(uv.x * 1.5 - time * 0.15, uv.y * 2.0 + time * 0.2, time * 0.2 + 3.0));
+          
+          // Mix colors based on noise
+          vec3 color = black;
+          
+          // Add orange in certain zones
+          float orangeMask = smoothstep(-0.2, 0.5, flow1 + combinedNoise * 0.5);
+          color = mix(color, orange, orangeMask * 0.8);
+          
+          // Add deep orange
+          float deepOrangeMask = smoothstep(0.1, 0.6, flow2);
+          color = mix(color, deepOrange, deepOrangeMask * 0.6);
+          
+          // Add subtle white highlights
+          float whiteMask = smoothstep(0.6, 0.9, combinedNoise + flow1 * 0.3);
+          color = mix(color, warmWhite, whiteMask * 0.15);
+          
+          // Add dark gray for depth
+          float grayMask = smoothstep(-0.5, 0.0, -flow1 - combinedNoise);
+          color = mix(color, darkGray, grayMask * 0.5);
+          
+          // Brightness and contrast
+          color = pow(color, vec3(1.1));
+          
+          // Subtle vignette for depth
+          float vignette = 1.0 - length(uv - 0.5) * 0.5;
+          color *= vignette * 0.3 + 0.7;
+          
+          // Subtle grain for organic feel
+          float grain = snoise(vec3(uv * 500.0, time * 10.0)) * 0.02;
+          color += grain;
+          
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+
+      // Gradient Animation Class
+      class GradientAnimation {
+        constructor() {
+          this.container = document.getElementById('gradient-background-container');
+          this.canvas = document.getElementById('gradient-canvas');
+
+          if (!this.container || !this.canvas) {
+            console.warn('Gradient container not found');
+            return;
+          }
+
+          this.init();
+          this.setupScrollTracking();
+          this.setupSectionClasses();
+          this.animate();
+        }
+
+        init() {
+          // Create Three.js scene
+          this.scene = new THREE.Scene();
+          this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+          this.renderer = new THREE.WebGLRenderer({
+            canvas: this.canvas,
+            antialias: true,
+            alpha: false
+          });
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+          // Shader uniforms
+          this.uniforms = {
+            uTime: { value: 0 },
+            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            uScrollProgress: { value: 0 }
+          };
+
+          const material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: this.uniforms
+          });
+
+          // Full-screen plane
+          const geometry = new THREE.PlaneGeometry(2, 2);
+          this.mesh = new THREE.Mesh(geometry, material);
+          this.scene.add(this.mesh);
+
+          // Handle resize
+          window.addEventListener('resize', () => this.onResize());
+        }
+
+        setupSectionClasses() {
+          // Add section-with-gradient class to hero, about, projects, and contact sections
+          const hero = document.querySelector('.hero');
+          const about = document.querySelector('.about');
+          const projects = document.querySelector('.projects');
+          const contact = document.querySelector('.contact');
+
+          if (hero) hero.classList.add('section-with-gradient');
+          if (about) about.classList.add('section-with-gradient');
+          if (projects) projects.classList.add('section-with-gradient');
+          if (contact) contact.classList.add('section-with-gradient');
+
+          this.gradientSections = [hero, about, projects, contact].filter(Boolean);
+        }
+
+        setupScrollTracking() {
+          window.addEventListener('scroll', () => {
+            this.updateGradientVisibility();
+          });
+        }
+
+        updateGradientVisibility() {
+          if (this.gradientSections.length === 0) return;
+
+          const lastSection = this.gradientSections[this.gradientSections.length - 1];
+          if (!lastSection) return;
+
+          const lastSectionBottom = lastSection.offsetTop + lastSection.offsetHeight;
+          const scrollY = window.scrollY;
+          const windowHeight = window.innerHeight;
+
+          // Calculate scroll progress
+          const totalGradientHeight = lastSectionBottom;
+          this.uniforms.uScrollProgress.value = Math.min(scrollY / totalGradientHeight, 1);
+
+          // Progressive fade when leaving last section
+          const fadeStart = lastSectionBottom - windowHeight;
+          const fadeEnd = lastSectionBottom;
+
+          if (scrollY > fadeStart && scrollY < fadeEnd + windowHeight) {
+            const fadeProgress = (scrollY - fadeStart) / (fadeEnd - fadeStart + windowHeight);
+            this.container.style.opacity = Math.max(0, 1 - fadeProgress);
+          } else if (scrollY >= fadeEnd + windowHeight) {
+            this.container.style.opacity = 0;
+          } else {
+            this.container.style.opacity = 1;
+          }
+        }
+
+        onResize() {
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+          this.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        }
+
+        animate() {
+          requestAnimationFrame(() => this.animate());
+
+          this.uniforms.uTime.value += 0.016; // ~60fps
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+
+      // Initialize after DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => new GradientAnimation());
+      } else {
+        new GradientAnimation();
       }
     })();
   </script>
