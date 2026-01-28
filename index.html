@@ -109,6 +109,11 @@
       transition: opacity 0.5s ease;
     }
 
+    /* Show gradient behind mobile menu when open */
+    body.menu-open #gradient-background-container {
+      z-index: 9998;
+    }
+
     #gradient-canvas {
       width: 100%;
       height: 100%;
@@ -2818,7 +2823,7 @@
         z-index: 9999;
       }
 
-      /* Canvas clone for mobile menu background */
+      /* Semi-transparent overlay - shows main 3D gradient canvas through */
       .nav__menu::before {
         content: '';
         position: absolute;
@@ -2826,24 +2831,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a0a05 25%, #d4590f 50%, #8a3a0a 75%, #0a0a0a 100%);
-        background-size: 400% 400%;
-        animation: menuGradientFlow 8s ease infinite;
+        background: rgba(0, 0, 0, 0.3);
         z-index: -1;
-      }
-
-      @keyframes menuGradientFlow {
-        0% {
-          background-position: 0% 50%;
-        }
-
-        50% {
-          background-position: 100% 50%;
-        }
-
-        100% {
-          background-position: 0% 50%;
-        }
       }
 
       .nav__menu.active {
@@ -3484,8 +3473,7 @@
 
       <!-- Project Card 2 - Alexium Immobilier -->
       <article class="project-card">
-        <a href="https://crypto-learn-academy-copy-117355dc.base44.app/" target="_blank" rel="noopener noreferrer"
-          class="project-card__link">
+        <a href="https://alexium-immobilier.com/" target="_blank" rel="noopener noreferrer" class="project-card__link">
           <div class="project-card__image">
             <video class="project-card__video" autoplay muted loop playsinline>
               <source src="VOTRE_URL_SUPABASE_VIDEO_ALEXIUM" type="video/mp4">
