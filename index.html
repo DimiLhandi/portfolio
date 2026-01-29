@@ -843,14 +843,15 @@
       font-size: var(--font-size-decorative);
       font-weight: 900;
       text-transform: uppercase;
-      color: var(--color-gray-100);
+      color: rgba(255, 255, 255, 0.03);
       white-space: nowrap;
       pointer-events: none;
-      z-index: var(--z-base);
+      z-index: 0;
       line-height: 0.85;
       letter-spacing: -0.02em;
       opacity: 0;
       transition: opacity 1s ease;
+      user-select: none;
     }
 
     .about__decorative.visible {
@@ -861,18 +862,20 @@
       max-width: 1400px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(300px, 450px) 1fr;
       gap: var(--space-3xl);
       align-items: center;
       position: relative;
-      z-index: var(--z-overlay);
+      z-index: 5;
+      padding: var(--space-xl);
     }
 
     .about__image-wrapper {
       position: relative;
       opacity: 0;
-      transform: translateX(-50px);
+      transform: translateX(-30px);
       transition: all 0.8s ease;
+      z-index: 2;
     }
 
     .about__image-wrapper.visible {
